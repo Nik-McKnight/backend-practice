@@ -1,6 +1,12 @@
 // -------This file will Reset your Database--------- //
 
-const { client, createTrainer, createType } = require("./client");
+const {
+  client,
+  createTrainer,
+  createType,
+  createSpecies,
+  createPokemon,
+} = require("./client");
 
 // Drop Tables
 const dropTables = async () => {
@@ -40,9 +46,9 @@ const createTables = async () => {
       );
     CREATE TABLE pokemon (
       id SERIAL PRIMARY KEY,
-      "trainerId" INTEGER REFERENCES trainers(id) NOT NULL,
+      "speciesId" INTEGER REFERENCES species(id) NOT NULL,
       name varchar(255) NOT NULL,
-      "speciesId" INTEGER REFERENCES species(id) NOT NULL
+      "trainerId" INTEGER REFERENCES trainers(id)
       );
         `);
 
@@ -78,10 +84,6 @@ async function createInitialTypes() {
     console.log("Creating initial types...");
     await createType({
       name: "Normal",
-    });
-
-    await createType({
-      name: "???",
     });
 
     await createType({
@@ -152,26 +154,75 @@ async function createInitialTypes() {
       name: "Poison",
     });
 
+    await createType({
+      name: "???",
+    });
+
     console.log("Created initial typees.");
   } catch (error) {
     console.error(error);
   }
 }
 
+async function createInitialSpecies() {
+  try {
+    console.log("Creating initial species...");
+    await createSpecies({
+      name: "Geodude",
+      primaryTypeId: 8,
+      secondaryTypeId: 7,
+    });
+    await createSpecies({
+      name: "Pikachu",
+      primaryTypeId: 6,
+    });
+    console.log("Created initial species.");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function createInitialPokemon() {
+  try {
+    console.log("Creating initial pokemon...");
+    await createPokemon({
+      speciesId: 1,
+    });
+    await createPokemon({
+      speciesId: 1,
+      name: "GeoBro",
+    });
+    await createPokemon({
+      speciesId: 1,
+      name: "GeoBro",
+      trainerId: 2,
+    });
+    console.log("Created initial pokemon.");
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 // Seed Data
-const seedData = async () => {};
+const seedData = async () => {
+  await createInitialTrainers();
+  await createInitialTypes();
+  await createInitialSpecies();
+  await createInitialPokemon();
+};
 // Call all of the functions together and 'BUILD' you db
 const rebuildDb = async () => {
   try {
     client.connect();
     await dropTables();
     await createTables();
-    await createInitialTrainers();
-    await createInitialTypes();
+    await seedData();
     // call your functions in the correct order!
   } catch (error) {
     console.log("error during rebuildDB");
     console.error(error);
+  } finally {
+    client.end();
   }
 };
 

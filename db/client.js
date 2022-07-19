@@ -42,4 +42,47 @@ async function createType({ name }) {
   }
 }
 
-module.exports = { client, createTrainer, createType };
+async function createSpecies({ name, primaryTypeId, secondaryTypeId = null }) {
+  try {
+    const {
+      rows: [species],
+    } = await client.query(
+      `
+            INSERT INTO species(name, "primaryTypeId", "secondaryTypeId")
+            VALUES($1, $2, $3)
+            ON CONFLICT (name) DO NOTHING
+            RETURNING *;
+        `,
+      [name, primaryTypeId, secondaryTypeId ? secondaryTypeId : 19]
+    );
+    return species;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function createPokemon({ speciesId, trainerId = null, name = null }) {
+  try {
+    const {
+      rows: [pokemon],
+    } = await client.query(
+      `
+            INSERT INTO pokemon("speciesId", "trainerId", name)
+            VALUES($1, $2, $3)
+            RETURNING *;
+        `,
+      [speciesId, trainerId, name ? name : "Make this show the species name"]
+    );
+    return pokemon;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = {
+  client,
+  createTrainer,
+  createType,
+  createSpecies,
+  createPokemon,
+};
