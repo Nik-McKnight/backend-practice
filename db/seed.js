@@ -110,6 +110,7 @@ const seedData = async () => {
   await createInitialTypes();
   await createInitialSpecies();
   await createInitialPokemon();
+  console.log("Database has been seeded.");
 };
 // Call all of the functions together and 'BUILD' you db
 const rebuildDb = async () => {

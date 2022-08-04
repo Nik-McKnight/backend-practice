@@ -1,10 +1,5 @@
 const client = require("../client");
 
-const express = require("express");
-const trainersRouter = express.Router();
-
-trainersRouter.get("/", async (req, res) => {});
-
 async function createTrainer({ username, password, name }) {
   try {
     const {
@@ -24,4 +19,21 @@ async function createTrainer({ username, password, name }) {
   }
 }
 
-module.exports = { trainersRouter, createTrainer };
+async function getAllTrainers() {
+  try {
+    console.log("Trying to fetch trainers");
+    const {
+      rows: [trainers],
+    } = await client.query(`
+      SELECT * 
+      FROM trainers;
+    `);
+    console.log("Fetched trainers");
+
+    return trainers;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = { createTrainer, getAllTrainers };

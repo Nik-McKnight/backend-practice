@@ -21,4 +21,20 @@ async function createPokemon({ speciesId, trainerId = null, name = null }) {
   }
 }
 
-module.exports = { createPokemon };
+async function getAllPokemon() {
+  try {
+    const {
+      rows: [pokemon],
+    } = await client.query(
+      `
+      SELECT *
+      FROM pokemon
+      `
+    );
+    return pokemon;
+  } catch (error) {
+    throw error;
+  }
+}
+
+module.exports = { createPokemon, getAllPokemon };
